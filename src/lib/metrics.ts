@@ -62,3 +62,43 @@ export function percentChange(value: number, previous: number): number | null {
   if (previous === 0) return null;
   return (value - previous) / previous;
 }
+
+export interface SourceShare {
+  source: string;
+  visitors: number;
+}
+
+export interface PageStat {
+  path: string;
+  views: number;
+  avgSeconds: number;
+  bounceRate: number;
+}
+
+const SOURCES = [
+  ["Organic search", 0.42],
+  ["Direct", 0.24],
+  ["Referral", 0.14],
+  ["Social", 0.12],
+  ["Email", 0.08],
+] as const;
+
+/** Splits total visitors across traffic sources; the remainder goes to the largest source so totals match. */
+export function trafficBySource(totalVisitors: number): SourceShare[] {
+  const shares = SOURCES.map(([source, w]) => ({ source, visitors: Math.floor(totalVisitors * w) }));
+  const assigned = shares.reduce((a, s) => a + s.visitors, 0);
+  shares[0].visitors += totalVisitors - assigned;
+  return shares;
+}
+
+const PAGES = ["/", "/pricing", "/docs/getting-started", "/blog/launch-week", "/features", "/changelog", "/signup"];
+
+export function topPages(totalVisitors: number, seed = 7): PageStat[] {
+  const rng = createRng(seed);
+  return PAGES.map((path, i) => ({
+    path,
+    views: Math.round((totalVisitors * 1.6) / (i + 1.4) * (0.9 + rng() * 0.2)),
+    avgSeconds: Math.round(35 + rng() * 140),
+    bounceRate: 0.25 + rng() * 0.45,
+  })).sort((a, b) => b.views - a.views);
+}

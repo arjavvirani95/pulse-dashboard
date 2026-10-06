@@ -43,3 +43,21 @@ describe("helpers", () => {
     expect(parseRange(undefined)).toBe("30d");
   });
 });
+
+import { topPages, trafficBySource } from "./metrics";
+
+describe("trafficBySource", () => {
+  it("allocates every visitor", () => {
+    const total = 12_345;
+    const shares = trafficBySource(total);
+    expect(shares.reduce((a, s) => a + s.visitors, 0)).toBe(total);
+  });
+});
+
+describe("topPages", () => {
+  it("is sorted by views descending", () => {
+    const pages = topPages(10_000);
+    const views = pages.map((p) => p.views);
+    expect(views).toEqual([...views].sort((a, b) => b - a));
+  });
+});
