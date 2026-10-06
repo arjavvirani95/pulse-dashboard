@@ -1,4 +1,6 @@
+import { Card } from "@/components/Card";
 import { KpiCard } from "@/components/KpiCard";
+import { RevenueChart } from "@/components/RevenueChart";
 import { computeKpis, generateDaily } from "@/lib/metrics";
 
 export default function Home() {
@@ -12,6 +14,9 @@ export default function Home() {
       <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {kpis.map((k) => <KpiCard key={k.label} kpi={k} />)}
       </section>
+      <Card id="revenue" title="Revenue">
+        <RevenueChart data={rows.slice(-days)} />
+      </Card>
     </main>
   );
 }
