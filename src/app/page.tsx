@@ -1,19 +1,24 @@
 import { Card } from "@/components/Card";
 import { KpiCard } from "@/components/KpiCard";
+import { RangePicker } from "@/components/RangePicker";
 import { PagesTable } from "@/components/PagesTable";
 import { RevenueChart } from "@/components/RevenueChart";
 import { SourcesChart } from "@/components/SourcesChart";
-import { computeKpis, generateDaily, topPages, trafficBySource } from "@/lib/metrics";
+import { RANGES, computeKpis, generateDaily, parseRange, topPages, trafficBySource } from "@/lib/metrics";
 
-export default function Home() {
-  const days = 30;
+export default async function Home({ searchParams }: { searchParams: Promise<{ range?: string }> }) {
+  const range = parseRange((await searchParams).range);
+  const days = RANGES[range];
   const rows = generateDaily(days * 2);
   const kpis = computeKpis(rows, days);
   const visitors = kpis[1].value;
 
   return (
     <main className="mx-auto max-w-6xl space-y-6 p-6">
-      <h1 className="text-2xl font-semibold">Overview</h1>
+      <header className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-2xl font-semibold">Overview</h1>
+        <RangePicker active={range} />
+      </header>
       <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {kpis.map((k) => <KpiCard key={k.label} kpi={k} />)}
       </section>
