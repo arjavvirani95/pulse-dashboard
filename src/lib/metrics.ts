@@ -42,8 +42,9 @@ export function generateDaily(days: number, end = new Date(), seed = 42): DailyM
   return out;
 }
 
+// Round to cents to avoid floating point drift when summing currency.
 const sum = (rows: DailyMetric[], key: keyof Omit<DailyMetric, "date">) =>
-  rows.reduce((acc, r) => acc + r[key], 0);
+  Math.round(rows.reduce((acc, r) => acc + r[key], 0) * 100) / 100;
 
 /** Splits the last 2*n days into current and previous periods and builds KPI cards. */
 export function computeKpis(rows: DailyMetric[], n: number): Kpi[] {
